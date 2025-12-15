@@ -7,9 +7,14 @@ import { Image } from '@/components/ui/image';
 import { ScrollView, ActivityIndicator } from 'react-native';
 import { HStack } from '@/components/ui/hstack';
 import { VStack } from '@/components/ui/vstack';
-import { useGetPokemonDetails } from '@/graphql/hooks';
-import { getPokemonImageUrl } from '@/graphql/types';
+import { useGetPokemonDetails } from '@/src/graphql/hooks';
+import { getPokemonImageUrl } from '@/src/graphql/types';
 import DetailsHeader from '@/components/DetailsHeader';
+import { useAppDispatch } from '@/src/redux/store';
+import { addNotification } from '@/src/redux/uiSlice';
+import { trackEvent, AppCenterEvents } from '@/src/services/appCenter';
+import { useEffect } from 'react';
+import { AppNotifications } from '@/src/services/pushNotifications';
 
 
 const typeColors: { [key: string]: string } = {
@@ -57,10 +62,30 @@ export default function PokemonDetails() {
     const { loading, error, pokemon } = useGetPokemonDetails(pokemonId);
     const { isFavorite, addFavorite, removeFavorite } = useFavorites();
     const favorite = isFavorite(pokemonId);
+    const dispatch = useAppDispatch();
+
+    // Track pokemon view
+    useEffect(() => {
+        if (pokemon) {
+            trackEvent(AppCenterEvents.POKEMON_VIEWED, {
+                pokemonId: pokemon.id.toString(),
+                pokemonName: pokemon.name,
+            });
+        }
+    }, [pokemon]);
+
     const handleToggleFavorite = () => {
         if (!pokemon) return;
         if (favorite) {
             removeFavorite(pokemon.id);
+            dispatch(addNotification({
+                message: `${pokemon.name} removido dos favoritos`,
+                type: 'info',
+            }));
+            trackEvent(AppCenterEvents.POKEMON_UNFAVORITED, {
+                pokemonId: pokemon.id.toString(),
+                pokemonName: pokemon.name,
+            });
         } else {
             const types = pokemon.pokemon_v2_pokemontypes.map((t: any) => t.pokemon_v2_type.name.toUpperCase());
             addFavorite({
@@ -69,6 +94,16 @@ export default function PokemonDetails() {
                 image: getPokemonImageUrl(pokemon),
                 types,
             });
+            dispatch(addNotification({
+                message: `${pokemon.name} adicionado aos favoritos!`,
+                type: 'success',
+            }));
+            trackEvent(AppCenterEvents.POKEMON_FAVORITED, {
+                pokemonId: pokemon.id.toString(),
+                pokemonName: pokemon.name,
+            });
+            // Enviar notificação push local
+            AppNotifications.pokemonCaught(pokemon.name);
         }
     };
 

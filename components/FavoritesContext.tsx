@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
-import { useAppSelector, useAppDispatch, RootState } from '../store';
-import { addFavorite, removeFavorite, setFavorites, FavoritePokemon } from '../slices/favoritesSlice';
-import { auth } from '@/lib/firebase';
-import { saveFavorites, loadFavorites } from '@/lib/favoritesStore';
+import { useAppSelector, useAppDispatch, RootState } from '../src/redux/store';
+import { addFavorite, removeFavorite, setFavorites, FavoritePokemon } from '../src/redux/favoritesSlice';
+import { auth } from '@/src/services/firebase';
+import { saveFavorites, loadFavorites } from '@/src/services/favoritesStore';
 import { onAuthStateChanged } from 'firebase/auth';
 
 export const useFavorites = () => {
@@ -42,7 +42,7 @@ export const useFavorites = () => {
         const user = auth.currentUser;
         if (user) {
             // Remove do array e salva
-            const updatedFavorites = favorites.filter((p) => p.id !== id);
+            const updatedFavorites = favorites.filter((p: any) => p.id !== id);
             await saveFavorites(user.uid, updatedFavorites);
         }
     };

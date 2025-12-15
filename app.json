@@ -1,40 +1,79 @@
 {
   "expo": {
-    "name": "starter-kit-expo",
-    "slug": "starter-kit-expo",
+    "name": "Pokémon Pokédex",
+    "slug": "pokemon-pokedex",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "starterkitexpo",
+    "icon": "./assets/images/pikachu.png",
+    "scheme": "pokemonpokedex",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/splash-icon.png",
+      "image": "./assets/images/pikachu.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#FDD835"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.pokemonpokedex.app",
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "remote-notification"
+        ]
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/pikachu.png",
+        "backgroundColor": "#FDD835"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.pokemonpokedex.app",
+      "permissions": [
+        "RECEIVE_BOOT_COMPLETED",
+        "VIBRATE",
+        "WAKE_LOCK"
+      ]
     },
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/pikachu.png"
     },
     "plugins": [
       "expo-router",
       "expo-web-browser",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/pikachu.png",
+          "color": "#FDD835",
+          "mode": "production"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "codePush": {
+        "enabled": true,
+        "androidDeploymentKey": "YOUR_ANDROID_DEPLOYMENT_KEY",
+        "iosDeploymentKey": "YOUR_IOS_DEPLOYMENT_KEY"
+      },
+      "appCenter": {
+        "android": {
+          "appSecret": "f23d6114-d92a-474c-b32f-a7aff8d0153e"
+        },
+        "ios": {
+          "appSecret": "YOUR_IOS_APP_SECRET_HERE"
+        }
+      },
+      "router": {},
+      "eas": {
+        "projectId": "d55360b2-bd98-4188-906a-960521a3d7d5"
+      }
     }
   }
 }

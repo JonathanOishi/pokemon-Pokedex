@@ -30,7 +30,7 @@ export default function FavoritesScreen() {
                         </Text>
                     ) : (
                         <Box className="flex-row flex-wrap justify-between">
-                            {favorites.map((pokemon) => (
+                            {favorites.map((pokemon: any) => (
                                 <PokemonCard
                                     key={pokemon.id}
                                     id={pokemon.id}

@@ -32,6 +32,27 @@ yarn-error.*
 
 # local env files
 .env*.local
+.env
 
 # typescript
 *.tsbuildinfo
+
+# APK/AAB builds (não commitar builds)
+*.apk
+*.aab
+*.ipa
+builds/
+
+# Firebase config (se tiver arquivo separado)
+google-services.json
+GoogleService-Info.plist
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

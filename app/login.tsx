@@ -9,23 +9,22 @@ import { Pressable } from '@/components/ui/pressable';
 import { Image } from '@/components/ui/image';
 import { ScrollView } from 'react-native';
 import { router } from 'expo-router';
-import { validateLogin } from '@/lib/auth';
-import { FavoritePokemon } from '@/slices/favoritesSlice';
-import { mockPokemons } from '@/data/mockPokemons';
+import { validateLogin } from '@/src/services/auth';
+import { FavoritePokemon } from '@/src/redux/favoritesSlice';
+import { useAppDispatch } from '@/src/redux/store';
+import { setUser, setError, setLoading } from '@/src/redux/authSlice';
+import { auth } from '@/src/services/firebase';
+import { trackEvent, AppCenterEvents } from '@/src/services/appCenter';
 
 export default function LoginScreen() {
+    const dispatch = useAppDispatch();
     const randomPokemon = useMemo<FavoritePokemon>(() => {
-        const list = mockPokemons;
-        if (!list || list.length === 0) {
-            return {
-                id: 25,
-                name: 'Pikachu',
-                image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png',
-                types: ['ELECTRIC'],
-            };
-        }
-        const idx = Math.floor(Math.random() * list.length);
-        return list[idx] as FavoritePokemon;
+        return {
+            id: 25,
+            name: 'Pikachu',
+            image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png',
+            types: ['ELECTRIC'],
+        };
     }, []);
 
     const [username, setUsername] = useState('');
@@ -46,18 +45,34 @@ export default function LoginScreen() {
 
         setIsLoading(true);
         setErrors({});
+        dispatch(setLoading(true));
 
         try {
             const res = await validateLogin(username, password);
             if (res.ok) {
+                const user = auth.currentUser;
+                if (user) {
+                    dispatch(setUser({
+                        uid: user.uid,
+                        email: user.email,
+                        displayName: user.displayName,
+                    }));
+                }
+                // Track login success
+                trackEvent(AppCenterEvents.LOGIN_SUCCESS, { email: username });
                 router.replace('/home');
             } else {
                 setErrors({ username: res.error, password: 'Verifique usuário e senha' });
+                dispatch(setError(res.error));
+                // Track login failure
+                trackEvent(AppCenterEvents.LOGIN_FAILED, { error: res.error });
             }
         } catch (error) {
             setErrors({ username: 'Erro ao conectar', password: 'Tente novamente' });
+            dispatch(setError('Erro ao conectar'));
         } finally {
             setIsLoading(false);
+            dispatch(setLoading(false));
         }
     };
 
@@ -79,7 +94,7 @@ export default function LoginScreen() {
                             <InputField
                                 value={username}
                                 onChangeText={setUsername}
-                                placeholder="AshKetchum123"
+                                placeholder="adm@adm.com.br"
                                 keyboardType="email-address"
                                 autoCapitalize="none"
                             />

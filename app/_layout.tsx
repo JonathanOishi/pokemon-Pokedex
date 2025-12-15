@@ -1,12 +1,8 @@
 import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
-import { ReduxProvider } from '../ReduxProvider';
+import { ReduxProvider } from '../src/redux/ReduxProvider';
 import '@/global.css';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from '@react-navigation/native';
+import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
@@ -16,13 +12,19 @@ import { StatusBar } from 'expo-status-bar';
 import { Fab, FabIcon } from '@/components/ui/fab';
 import { MoonIcon, SunIcon } from '@/components/ui/icon';
 import { ApolloProvider } from '@apollo/client';
-import { apolloClient } from '@/lib/apolloClient';
+import { apolloClient } from '@/src/services/apolloClient';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import NotificationManager from '@/components/NotificationManager';
+import { auth } from '@/src/services/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { useAppDispatch } from '@/src/redux/store';
+import { setUser, logout } from '@/src/redux/authSlice';
+import { setTheme } from '@/src/redux/uiSlice';
+import { initializeAppCenter } from '@/src/services/appCenter';
+import { usePushNotifications } from '@/src/hooks/usePushNotifications';
+import { useNotificationHandler } from '@/src/hooks/useNotificationHandler';
 
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from 'expo-router';
+export { ErrorBoundary } from 'expo-router';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -32,8 +34,6 @@ export default function RootLayout() {
     ...FontAwesome.font,
   });
 
-  const [styleLoaded, setStyleLoaded] = useState(false);
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
   }, [error]);
@@ -43,19 +43,59 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [loaded]);
-  return <RootLayoutNav />;
+
+  if (!loaded) {
+    return null;
+  }
+
+  return (
+    <SafeAreaProvider>
+      <ReduxProvider>
+        <ApolloProvider client={apolloClient}>
+          <RootLayoutNav />
+        </ApolloProvider>
+      </ReduxProvider>
+    </SafeAreaProvider>
+  );
 }
 
 function RootLayoutNav() {
   const pathname = usePathname();
   const [colorMode, setColorMode] = useState<'light' | 'dark'>('light');
   const navState = useRootNavigationState();
+  const dispatch = useAppDispatch();
+  const { expoPushToken } = usePushNotifications();
 
-  // Ensure initial navigation only occurs after root navigator mounts
+  // Hook para gerenciar eventos de toque em notificações
+  useNotificationHandler();
+
+  useEffect(() => {
+    initializeAppCenter();
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        dispatch(setUser({
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName,
+        }));
+      } else {
+        dispatch(logout());
+      }
+    });
+
+    return () => unsubscribe();
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(setTheme(colorMode === 'dark' ? 'dark' : 'light'));
+  }, [colorMode, dispatch]);
+
   useEffect(() => {
     if (!navState?.key) return;
 
-    // Use setTimeout to ensure navigation happens after mount
     const timer = setTimeout(() => {
       if (pathname === '/') {
         router.replace('/login');
@@ -66,27 +106,22 @@ function RootLayoutNav() {
   }, [navState?.key, pathname]);
 
   return (
-    <SafeAreaProvider>
-      <ReduxProvider>
-        <ApolloProvider client={apolloClient}>
-          <GluestackUIProvider mode={colorMode}>
-            <ThemeProvider value={colorMode === 'dark' ? DarkTheme : DefaultTheme}>
-              <Slot />
-              {pathname === '/' && (
-                <Fab
-                  onPress={() =>
-                    setColorMode(colorMode === 'dark' ? 'light' : 'dark')
-                  }
-                  className="m-6"
-                  size="lg"
-                >
-                  <FabIcon as={colorMode === 'dark' ? MoonIcon : SunIcon} />
-                </Fab>
-              )}
-            </ThemeProvider>
-          </GluestackUIProvider>
-        </ApolloProvider>
-      </ReduxProvider>
-    </SafeAreaProvider>
+    <GluestackUIProvider mode={colorMode}>
+      <ThemeProvider value={colorMode === 'dark' ? DarkTheme : DefaultTheme}>
+        <NotificationManager />
+        <Slot />
+        {pathname === '/' && (
+          <Fab
+            onPress={() =>
+              setColorMode(colorMode === 'dark' ? 'light' : 'dark')
+            }
+            className="m-6"
+            size="lg"
+          >
+            <FabIcon as={colorMode === 'dark' ? MoonIcon : SunIcon} />
+          </Fab>
+        )}
+      </ThemeProvider>
+    </GluestackUIProvider>
   );
 }

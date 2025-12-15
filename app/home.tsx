@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { Box } from '@/components/ui/box';
 import { Text } from '@/components/ui/text';
 import { ScrollView, ActivityIndicator } from 'react-native';
@@ -9,16 +9,17 @@ import PokemonCard from '@/components/PokemonCard';
 import SearchBar from '@/components/SearchBar';
 import TypeFilter from '@/components/TypeFilter';
 import HeartIcon from '@/components/icons/HeartIcon';
-import { useGetPokemons, useGetPokemonsByType } from '@/graphql/hooks';
-import { auth } from '@/lib/firebase';
-import { loadFavorites } from '@/lib/favoritesStore';
-import { useAppDispatch } from '@/store';
-import { setFavorites } from '@/slices/favoritesSlice';
+import { useGetPokemons, useGetPokemonsByType } from '@/src/graphql/hooks';
+import { auth } from '@/src/services/firebase';
+import { loadFavorites } from '@/src/services/favoritesStore';
+import { useAppDispatch, useAppSelector } from '@/src/redux/store';
+import { setFavorites } from '@/src/redux/favoritesSlice';
+import { setSearchQuery, setSelectedType } from '@/src/redux/pokemonSlice';
 
 export default function Home() {
-    const [searchQuery, setSearchQuery] = useState('');
-    const [selectedType, setSelectedType] = useState('ALL');
     const dispatch = useAppDispatch();
+    const searchQuery = useAppSelector((state) => state.pokemon.searchQuery);
+    const selectedType = useAppSelector((state) => state.pokemon.selectedType);
 
     const { loading: loadingAll, pokemons: allPokemons } = useGetPokemons(151, 0);
     const { loading: loadingByType, pokemons: pokemonsByType } = useGetPokemonsByType(
@@ -55,19 +56,24 @@ export default function Home() {
                         <Text className="text-3xl font-bold text-typography-900">
                             Pokedex
                         </Text>
-                        <Pressable onPress={() => router.push('/favorites')}>
-                            <HeartIcon size={28} color="#e11d48" />
-                        </Pressable>
+                        <HStack space="md">
+                            <Pressable onPress={() => router.push('/settings')}>
+                                <Text className="text-2xl">⚙️</Text>
+                            </Pressable>
+                            <Pressable onPress={() => router.push('/favorites')}>
+                                <HeartIcon size={28} color="#e11d48" />
+                            </Pressable>
+                        </HStack>
                     </HStack>
 
                     <SearchBar
                         value={searchQuery}
-                        onChangeText={setSearchQuery}
+                        onChangeText={(text) => dispatch(setSearchQuery(text))}
                     />
 
                     <TypeFilter
                         selectedType={selectedType}
-                        onSelectType={setSelectedType}
+                        onSelectType={(type) => dispatch(setSelectedType(type))}
                     />
                 </Box>
 
