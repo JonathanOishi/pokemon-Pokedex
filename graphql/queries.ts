@@ -1,9 +1,14 @@
 import { gql } from '@apollo/client';
 
-// Query para buscar lista de Pokémons
+// Query para buscar lista de Pokémons (apenas 1ª geração)
 export const GET_POKEMONS = gql`
   query GetPokemons($limit: Int!, $offset: Int!) {
-    pokemon_v2_pokemon(limit: $limit, offset: $offset, order_by: { id: asc }) {
+    pokemon_v2_pokemon(
+      where: { id: { _lte: 151 } }
+      limit: $limit
+      offset: $offset
+      order_by: { id: asc }
+    ) {
       id
       name
       pokemon_v2_pokemontypes {
@@ -54,11 +59,16 @@ export const GET_POKEMON_DETAILS = gql`
   }
 `;
 
-// Query para buscar Pokémons por tipo
+// Query para buscar Pokémons por tipo (apenas 1ª geração)
 export const GET_POKEMONS_BY_TYPE = gql`
   query GetPokemonsByType($typeName: String!, $limit: Int!) {
     pokemon_v2_pokemon(
-      where: { pokemon_v2_pokemontypes: { pokemon_v2_type: { name: { _eq: $typeName } } } }
+      where: {
+        _and: [
+          { id: { _lte: 151 } }
+          { pokemon_v2_pokemontypes: { pokemon_v2_type: { name: { _eq: $typeName } } } }
+        ]
+      }
       limit: $limit
       order_by: { id: asc }
     ) {
@@ -76,10 +86,19 @@ export const GET_POKEMONS_BY_TYPE = gql`
   }
 `;
 
-// Query para buscar Pokémons por nome (search)
+// Query para buscar Pokémons por nome (search - apenas 1ª geração)
 export const SEARCH_POKEMONS = gql`
   query SearchPokemons($name: String!) {
-    pokemon_v2_pokemon(where: { name: { _ilike: $name } }, limit: 20, order_by: { id: asc }) {
+    pokemon_v2_pokemon(
+      where: {
+        _and: [
+          { id: { _lte: 151 } }
+          { name: { _ilike: $name } }
+        ]
+      }
+      limit: 20
+      order_by: { id: asc }
+    ) {
       id
       name
       pokemon_v2_pokemontypes {
