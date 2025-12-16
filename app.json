@@ -4,12 +4,12 @@
     "slug": "pokemon-pokedex",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/pikachu.png",
+    "icon": "./assets/images/icon.png",
     "scheme": "pokemonpokedex",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/pikachu.png",
+      "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#FDD835"
     },
@@ -24,7 +24,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/pikachu.png",
+        "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#FDD835"
       },
       "edgeToEdgeEnabled": true,
@@ -38,7 +38,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/pikachu.png"
+      "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
       "expo-router",
@@ -47,7 +47,7 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/images/pikachu.png",
+          "icon": "./assets/images/icon.png",
           "color": "#FDD835",
           "mode": "production"
         }

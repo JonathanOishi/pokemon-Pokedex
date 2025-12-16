@@ -58,17 +58,19 @@ npm run android  # ou npm run ios
 </div>
 
 <div align="center">
-<div style="display: flex; justify-content: center; gap: 10px;">
-  <a href="https://freeimage.host/i/KmhzKdP">
-    <img src="https://iili.io/KmhzKdP.md.png" alt="KmhzKdP" style="width: 32%; height: auto;">
-  </a>
+  <div style="display: flex; justify-content: center; gap: 10px;">
+    
+    <a href="https://freeimage.host/i/faQqa4V">
+      <img src="https://iili.io/faQqa4V.md.png" alt="faQqa4V" style="width: 32%; height: auto;">
+    </a>
 
-  <a href="https://freeimage.host/i/Kmhz3rB">
-    <img src="https://iili.io/Kmhz3rB.md.png" alt="Kmhz3rB" style="width: 32%; height: auto;">
-  </a>
+    <a href="https://freeimage.host/i/faQq0YP">
+      <img src="https://iili.io/faQq0YP.md.png" alt="faQq0YP" style="width: 32%; height: auto;">
+    </a>
 
-  <a href="https://freeimage.host/i/Kmhz21V">
-    <img src="https://iili.io/Kmhz21V.md.png" alt="Kmhz21V" style="width: 32%; height: auto;">
-  </a>
-</div>
+    <a href="https://freeimage.host/i/faQql3B">
+      <img src="https://iili.io/faQql3B.md.png" alt="faQql3B" style="width: 32%; height: auto;">
+    </a>
+
+  </div>
 </div>
