@@ -5,12 +5,12 @@ import { getFirestore, Firestore } from 'firebase/firestore';
 
 // Firebase Web SDK configuration
 const firebaseConfig = {
-    apiKey: 'AIzaSyDd3lB9xMvK_DGh-r4OY05oZKRcuCojqMo',
-    authDomain: 'pokemonpokedex-4602b.firebaseapp.com',
-    projectId: 'pokemonpokedex-4602b',
-    storageBucket: 'pokemonpokedex-4602b.firebasestorage.app',
-    messagingSenderId: '924840001810',
-    appId: '1:924840001810:web:4edf16a0dc69e67c51b3cb',
+    apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
+    authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
 };
 
 // Initialize only once and reuse the instance
